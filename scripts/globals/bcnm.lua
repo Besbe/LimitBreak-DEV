@@ -1,4 +1,3 @@
-
 require("scripts/globals/keyitems")
 require("scripts/globals/missions")
 require("scripts/globals/quests")
@@ -941,7 +940,7 @@ function TradeBCNM(player, npc, trade, onUpdate)
         if itemId == nil or itemId < 1 or itemId > 65535 or trade:getItemCount() ~= 1 or trade:getSlotQty(0) ~= 1 then
             return false
         elseif player:hasWornItem(itemId) then
-            player:messageBasic(56, 0, 0) -- Unable to use item.
+            player:messageSpecial(GetCrackedMessage(player:getZoneID(), 0), 0, 0, 0, itemId)
             return false
         end
     end
@@ -1084,6 +1083,7 @@ function EventUpdateBCNM(player, csid, option, extras)
                     -- set other traded item to worn
                     elseif player:hasItem(item) and player:getName() == initiatorName then
                         player:createWornItem(item)
+                        player:messageSpecial(GetCrackedMessage(zone, 1), 0, 0, 0, item)
                     end
                 end
 
@@ -1127,4 +1127,12 @@ function EventFinishBCNM(player, csid, option)
         return true
     end
     return false
+end
+
+function GetCrackedMessage(zone, option)
+    -- option 0 = There is a crack in the <item>. It no longer contains a monster.
+    -- option 1 = A crack has formed on the <item>, and the beast inside has been unleashed!
+    local message = 7523 + option
+    if zone == tpz.zone.GHELSBA_OUTPOST then message = 474 + option end
+    return message
 end
